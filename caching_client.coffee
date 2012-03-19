@@ -6,6 +6,7 @@ neo4j = require('./driver')
 
 exports.createClient = (options, redis_options)->
   options = options || {}
+  redis_options = redis_options || {}
   neo4jClient = neo4j.createClient(options)
   if redis_options['redisClient']
     redisClient = redis_options['redisClient']
