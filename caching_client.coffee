@@ -36,7 +36,7 @@ exports.createClient = (options, redis_options)->
   neo4jClient.createNode = (index, key, value, callback)->
     input = {}
     input[key] = value
-    neo4jClient.post 'node', input, (obj)->
+    neo4jClient.post 'node', input, (err, obj)->
       data = { uri: obj.self, key: key, value: value }
       neo4jClient.post(['index/node', esc(index)], data, callback)
 
