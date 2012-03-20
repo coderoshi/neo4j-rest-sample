@@ -9,11 +9,11 @@ exports.createClient = (options)->
   port = options.port || 7474
   limit = options.limit || 10
 
-  header = {'Content-Type':'application/json'}
+  headers = {'Content-Type':'application/json'}
   if options.username && options.password
     auth = new Buffer("#{options.username}:#{options.password}").toString('base64')
     auth = "Basic #{auth}"
-    header['Authorization'] = auth
+    headers['Authorization'] = auth
   
   dequeue = () ->
     if backlog.length and running < limit
@@ -25,7 +25,7 @@ exports.createClient = (options)->
       host: host
       port: port
       path: '/db/data/' + (if path.join then path.join('/') else path)
-      headers: header
+      headers: headers
       method: method
     }, (res)->
       buffer = ''

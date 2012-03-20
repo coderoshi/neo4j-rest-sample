@@ -32,16 +32,17 @@ exports.createClient = (options, redis_options)->
     path = ['index/node', esc(index), esc(key), esc(value)]
     neo4jClient.get(path, callback)
 
-  # create a key/value node and index it.
-  neo4jClient.createNode = (index, key, value, callback)->
-    input = {}
-    input[key] = value
+  # create a node and index it.
+  neo4jClient.createNode = (index, key, value, input, callback)->
+    if !input || input.length <= 0
+      input = {}
+      input[key] = value
     neo4jClient.post 'node', input, (err, obj)->
       data = { uri: obj.self, key: key, value: value }
       neo4jClient.post(['index/node', esc(index)], data, callback)
 
   # lookup a node or create/index and cache it
-  neo4jClient.lookupOrCreateNode = (index, key, value, callback)->
+  neo4jClient.lookupOrCreateNode = (index, key, value, input, callback)->
     
     cacheKey = "lookup:#{index}:#{key}:#{value}"
     ex = neo4jClient.expiry
@@ -63,7 +64,7 @@ exports.createClient = (options, redis_options)->
               redisClient.setex(cacheKey, ex, JSON.stringify(list[0]))
             else
               # missed index, create it and cache it
-              neo4jClient.createNode index, key, value, (obj)->
+              neo4jClient.createNode index, key, value, input, (obj)->
                 pending.emit(cacheKey, obj)
                 redisClient.setex(cacheKey, ex, JSON.stringify(obj))
 
